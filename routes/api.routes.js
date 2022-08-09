@@ -64,7 +64,7 @@ router.post('/news-letter', async (req, res, next) => {
         })
         const { email } = req.body
         const values = await schema.validateAsync({ email })
-        mail(values.email);
+        await mail(values.email);
         return res.json('Mail sent successfully')
     } catch (error) {
         next(error)

@@ -11,15 +11,21 @@ const transport = nodemailer.createTransport({
 });
 
 module.exports = function sendMail(email) {
-    const mailOptions = {
-        from: process.env.MAIL_FROM_ADDRESS,
-        to: email,
-        subject: "NewsLetter",
-        text: `You have successfuly subscribed to our newsletter`,
-    };
-    transport.sendMail(mailOptions, (err, info) => {
-        if (err) {
-            console.log(err);
-        } else console.log(info);
-    });
+    return new Promise((resolve, reject) => {
+        const mailOptions = {
+            from: process.env.MAIL_FROM_ADDRESS,
+            to: email,
+            subject: "NewsLetter",
+            text: `You have successfuly subscribed to our newsletter`,
+        };
+
+        transport.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                reject(error)
+            } else resolve(info);
+        });
+
+    })
+
+
 };
