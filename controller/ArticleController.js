@@ -34,9 +34,38 @@ class ArticleController {
             const article = await prisma.article.findUnique({
                 where: { id: id },
                 include: { categories: { select: { category: { select: { title: true } } } } },
+            });
+            if (article) {
+                return res.json(article);
+            }
+            return res.status(404).json({ "message": "Article Not Found" });
+        } catch (error) {
+            return next(error);
+        }
+    };
+    deleteArticle = async (req, res, next) => {
+        try {
+            const id = parseInt(req.params.id);
+
+            const article = await prisma.article.findUnique({
+                where: { id: id },
+                include: { categories: true },
                 rejectOnNotFound: true
             });
-            return res.json(article);
+            for (const index in article.categories) {
+                console.log(index);
+                await prisma.categoriesOnArticles.delete({
+                    where: {
+                        articleId_categoryId:
+                        {
+                            articleId: article.categories[index].articleId,
+                            categoryId: article.categories[index].categoryId
+                        }
+                    }
+                })
+            }
+            const deleted = await prisma.article.delete({ where: { id: article.id } });
+            return res.json(deleted);
         } catch (error) {
             return next(error);
         }

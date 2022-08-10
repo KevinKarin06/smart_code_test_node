@@ -19,10 +19,13 @@ class CategoryController {
         try {
             const id = parseInt(req.params.id);
 
-            const category = await prisma.category.findUniqueOrThrow({
+            const category = await prisma.category.findUnique({
                 where: { id: id }
             });
-            return res.json(category);
+            if (category) {
+                return res.json(category);
+            }
+            return res.status(404).json({ "message": "Category Not Found" });
         } catch (error) {
             return next(error);
         }
@@ -62,6 +65,30 @@ class CategoryController {
             const category = await prisma.category.update({ where: { id: oldCategory.id }, data: { title: values.title, description: values.description } })
 
             return res.json(category);
+        } catch (error) {
+            return next(error);
+        }
+    };
+    deleteCategory = async (req, res, next) => {
+        try {
+
+            const id = parseInt(req.params.id);
+
+            const category = await prisma.category.findUniqueOrThrow({ where: { id: id }, include: { posts: true } })
+            for (const index in category.posts) {
+                console.log(index);
+                await prisma.categoriesOnArticles.delete({
+                    where: {
+                        articleId_categoryId:
+                        {
+                            articleId: category.posts[index].articleId,
+                            categoryId: category.posts[index].categoryId
+                        }
+                    }
+                })
+            }
+            const deleted = await prisma.category.delete({ where: { id: category.id } })
+            return res.json(deleted);
         } catch (error) {
             return next(error);
         }

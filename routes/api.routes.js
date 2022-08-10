@@ -42,6 +42,7 @@ router.post(
 
 router.get('/article', articleController.getAllArticles)
 router.get('/article/:id', articleController.getArticle)
+router.delete('/article/:id', articleController.deleteArticle)
 
 
 //CATEGORY ROUTES
@@ -56,6 +57,7 @@ router.put(
 )
 router.get('/category', categoryController.getAllCategories)
 router.get('/category/:id', categoryController.getCategory)
+router.delete('/category/:id', categoryController.deleteCategory)
 
 router.post('/news-letter', async (req, res, next) => {
     try {
